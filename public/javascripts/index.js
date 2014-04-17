@@ -50,6 +50,7 @@ var tmpl = '<li><input type="text"><span></span></li>',
     deleteUl.sortable({
     	connectWith:mainUl,
 		receive: function (event,ui) {
+       tolerance: "pointer";
 		   ui.item.remove();
 		}
     });
