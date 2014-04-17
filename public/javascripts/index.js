@@ -8,20 +8,26 @@ var tmpl = '<li><input type="text"><span></span></li>',
     mainUl = $('.main'),              // main <ul>
     deleteUl = $('.delete'),          // delete <ul>
     doneUl = $('.done');              // done <ul>
-
+    var flag = false;
 
     addButton.on('click',function(){
     	$(tmpl).prependTo(mainUl).addClass('is-editing').find('input').focus();
     })
 
     mainUl.on('keyup','input',function(e){
-    	if(e.which === 13){
-    		var input = $(this);
-    		li = input.parents('li');
-    		li.find('span').text( input.val() );
-    		li.removeClass('is-editing');
-    		save();
-    	}
+    	if(e.which !== 13){
+        flag=true;
+      }
+      if(flag===true){
+          if(e.which === 13){
+          var input = $(this);
+          li = input.parents('li');
+          li.find('span').text( input.val() );
+          li.removeClass('is-editing');
+          save();
+          }
+      }
+      
     });
 
     load();
@@ -51,7 +57,7 @@ var tmpl = '<li><input type="text"><span></span></li>',
     doneUl.sortable({
     	receive: function (event,ui) {
     		ui.item.appendTo(mainUl).addClass('is-done');
-    		mainUl.sortable.save();
+    		save();
     	}
     });
 
@@ -60,16 +66,32 @@ var tmpl = '<li><input type="text"><span></span></li>',
   	function save(){
   		var arr = [];
   		mainUl.find('span').each(function(){
-    		arr.push($(this).text());
+    		if (arr!=="") {
+          arr.push($(this).text());
+        };
   		});
-  		localStorage.todoItems = JSON.stringify(arr); 
+      var arr2 = [];
+      mainUl.find('li').each(function(){
+          if($(this).hasClass("is-done")){
+            arr2.push("is-done");
+          }
+          else{
+            arr2.push("a");
+          }
+      });
+  		localStorage.todoItems = JSON.stringify(arr);
+      localStorage["class"] = JSON.stringify(arr2);
   	};
 
   	function load(){
   		var arr = JSON.parse( localStorage.todoItems ), i;
+      var arr2 = JSON.parse( localStorage["class"] );
   		for(i=0; i<arr.length; i+=1){
-    		$(tmpl).appendTo(mainUl).find('span').text(arr[i]);
-  		}
+        if (arr[i]!==null) {
+          $(tmpl).appendTo(mainUl).find('span').text(arr[i]).parents().addClass(arr2[i]);;
+
+        }
+      };
   	}
 
 
